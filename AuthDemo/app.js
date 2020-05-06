@@ -37,7 +37,7 @@ app.get("/",function(req,res){
     res.render("home");
 });
 
-app.get("/secret",function(req,res){
+app.get("/secret",isLoggedIn,function(req,res){
     res.render("secret");
 });
     
@@ -79,6 +79,21 @@ app.post("/login",passport.authenticate("local",{    //passport.authenticate tak
              failureRedirect:"/login"
 }),function(req,res){
 });
+
+//logout logic
+app.get("/logout",function(req,res){
+   req.logout(); //no change in db...passport is destroying users data at the current session
+    res.redirect("/");
+});
+
+//middleware
+//req is request object,res is response object and next is to run next object(or code) 
+function isLoggedIn(req,res,next){                                      
+    if(req.isAuthenticated() == true){
+         return next();
+       }
+    res.redirect("/login");
+}
 
 
 app.listen(3000,function(req,res){
