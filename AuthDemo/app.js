@@ -24,6 +24,7 @@ app.set("view engine","ejs");
 app.use(passport.initialize());
 app.use(passport.session());
 
+passport.use(new LocalStrategy(User.authenticate())) //authenticate() is coming from passportLocalMongoose
 passport.serializeUser(User.serializeUser()); //to encode sessions
 passport.deserializeUser(User.deserializeUser()); //to decode sessions
 
@@ -58,10 +59,25 @@ app.post("/register",function(req,res){
            console.log(err);
            return res.render("register");
         }
-        passport.authenticate("local")(req,res,function(){
+        passport.authenticate("local")(req,res,function(){ //.authenticate keeps the user logged in
             res.redirect("/secret");
         })
     });
+});
+
+//LOGIN ROUTES
+
+//render login form
+app.get("/login",function(req,res){
+    res.render("login");
+});
+
+//login logic
+//middleware -- piece of code that goes between request is made and final callback
+app.post("/login",passport.authenticate("local",{    //passport.authenticate takes the username and pswd from db and
+             successRedirect:"/secret",              //compare it with what user has entered...    
+             failureRedirect:"/login"
+}),function(req,res){
 });
 
 
